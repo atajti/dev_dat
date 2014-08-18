@@ -75,7 +75,7 @@ get_F1_tweets <- function(end_time="2014-12-31 23:59"){
   }
 
   # write results to a csv:
-  filename <- paste0("F1twts_", as.Date(Sys.time()))
+  filename <- paste0("F1twts_", end_time)
   write.csv(f1_twts_df, file=filename,
             row.names=FALSE)
   return(f1_twts_df)
