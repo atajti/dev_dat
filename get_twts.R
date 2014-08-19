@@ -3,10 +3,11 @@
 #' This function is a wrapper which downloads F1 tweets.
 #'
 #' @param end_time time when the download shoud stop.
-#'   A string standard POSIX format
-#' @return A \code{data.frame} with the downloaded tweets
+#'   A string standard POSIX format.
+#' @param write Logical. Wether to write results in a csv file.
+#' @return A \code{data.frame} with the downloaded tweets.
 #' @note Download may stop after 15 minutes after the intended time
-#'   as the result of download limits in the Twitter API
+#'   as the result of download limits in the Twitter API.
 #'
 #' @author András Tajti \email{atajti@@gmail.com}
 #' @export
@@ -14,7 +15,8 @@
 #' @docType function
 
 
-get_F1_tweets <- function(end_time="2014-12-31 23:59"){
+get_F1_tweets <- function(end_time="2014-12-31 23:59",
+                          write=TRUE){
   # getting tweets about #F1 and F1 pilots and teams
 
 
@@ -57,6 +59,14 @@ get_F1_tweets <- function(end_time="2014-12-31 23:59"){
 
     # #F1 tweets
     f1_twts <- searchTwitter("#F1", sinceID=since_id)
+    if(!is.null(f1_twts)){
+      f1_twts_df <- rbind(f1_twts_df, twListToDF(f1_twts))
+    } else {
+      cat("\nSleep until",
+          as.Date(Sys.time() + 15*60,
+                  format="%m. %d. %H:%M"))
+          Sys.sleep(60)
+    }
     f1_twts_df <- rbind(f1_twts_df, twListToDF(f1_twts))
     # new since_id:
     since_id <- f1_twts_df[1, "id"]
@@ -67,16 +77,23 @@ get_F1_tweets <- function(end_time="2014-12-31 23:59"){
         {userTimeline(usr, n=100,
                       includeRts=TRUE, sinceID=since_id)}))
       if(!is.null(twts)){
-        f1_twts_df <- rbind(twListToDF(twts))
+        f1_twts_df <- rbind(f1_twts_df, twListToDF(twts))
         } else {
-          Sys.sleep(15*60)
+          cat("\nSleep until",
+              as.Date(Sys.time() + 15*60,
+                      format="%m. %d. %H:%M"),
+              ".csv")
+          Sys.sleep(60)
         }
     }
   }
 
   # write results to a csv:
-  filename <- paste0("F1twts_", end_time)
-  write.csv(f1_twts_df, file=filename,
-            row.names=FALSE)
+  if(write){
+    filename <- paste0("F1twts_", end_time)
+    write.csv(f1_twts_df, file=filename,
+              row.names=FALSE)
+  }
+  
   return(f1_twts_df)
 }
