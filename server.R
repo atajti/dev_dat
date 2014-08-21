@@ -35,7 +35,10 @@ shinyServer(function(input, output) {
       # plot it
       g <- ggplot(plot_data,
              aes(x=created, color=screenName)) + 
-           geom_line(stat="bin")
+           geom_line(stat="bin") +
+           labs(x="Time",
+                y="Number of tweets",
+                color="User")
     
     } else {
       # subset data by time
@@ -44,8 +47,10 @@ shinyServer(function(input, output) {
       # plot it
       g <- ggplot(plot_data,
           aes(x=created)) + 
-        geom_line(stat="bin", color="blue")
-
+        geom_line(stat="bin", color="blue") +
+        labs(x="Time",
+            y="Number of tweets",
+            color="User")
     }
     
     # if number of #F1 hashtags are important:
@@ -55,13 +60,15 @@ shinyServer(function(input, output) {
                            aes(created,
                              color=screenName,
                              fill= screenName),
-                           stat="bin")
+                           stat="bin") +
+        labs(fill="Users' #F1 tweets", color="Users' tweets")
       } else {
         g <- g + geom_area(data=plot_data[plot_data$F1,],
                            aes(created),
                            stat="bin",
                            color="red",
-                           fill="red")
+                           fill="red") +
+        labs(fill="", color="")
       }
     }
 

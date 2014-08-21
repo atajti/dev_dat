@@ -7,7 +7,8 @@ dat <- read.csv("F1twts_2014-08-19 15:30:00.csv",
 # create time variable:
 dat$created <- as.POSIXct(dat$created)
 # create a ggplot with users:
-scnames <- sort(unique(dat$screenName))
+scnames <- sort(names(table(dat$screenName))[
+  which(table(dat$screenName) > 0.25*max(table(dat$screenName)))])
 # check "#F1" is in the tweet
 dat$F1 <- grepl("#F1", dat$text)
 
