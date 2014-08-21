@@ -1,9 +1,9 @@
 # loading packages
 library(ggplot2)
-library(igraph)
+library(shiny)
 
 # analyzing tweets
-dat <- read.csv("F1twts_2014-08-19 12:00:00.csv",
+dat <- read.csv("F1twts_2014-08-19 15:30:00.csv",
                 stringsAsFactors=FALSE)
 # create time variable:
 dat$created <- as.POSIXct(dat$created)
@@ -28,19 +28,24 @@ shinyServer(function(input, output) {
 
     # generate an rnorm distribution and plot it
     if(input$per_user){
-      # subset data
-      plot_data <- dat[(dat$screenName %in% input$users),] 
+      # subset data by users and time
+      plot_data <- dat[(dat$screenName %in% input$users) &
+                       (as.numeric(dat$created) > input$date[1] &
+                       as.numeric(dat$created) < input$date[2]),] 
       # plot it
       g <- ggplot(plot_data,
              aes(x=created, color=screenName)) + 
            geom_line(stat="bin")
+    
     } else {
-      # copy data
-      plot_data <- dat
+      # subset data by time
+      plot_data <- dat[(as.numeric(dat$created) > input$date[1] &
+                       as.numeric(dat$created) < input$date[2]),]
       # plot it
-      g <- ggplot(dat,
+      g <- ggplot(plot_data,
           aes(x=created)) + 
         geom_line(stat="bin", color="blue")
+
     }
     
     # if number of #F1 hashtags are important:

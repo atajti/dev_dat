@@ -1,5 +1,8 @@
+library(shiny)
+library(ggplot2)
+
 # analyzing tweets
-dat <- read.csv("F1twts_2014-08-19 12:00:00.csv",
+dat <- read.csv("F1twts_2014-08-19 15:30:00.csv",
                 stringsAsFactors=FALSE)
 # create time variable:
 dat$created <- as.POSIXct(dat$created)
