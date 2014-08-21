@@ -81,8 +81,7 @@ get_F1_tweets <- function(end_time="2014-12-31 23:59",
         } else {
           cat("\nSleep until",
               as.Date(Sys.time() + 15*60,
-                      format="%m. %d. %H:%M"),
-              ".csv")
+                      format="%m. %d. %H:%M"))
           Sys.sleep(60)
         }
     }
@@ -90,7 +89,7 @@ get_F1_tweets <- function(end_time="2014-12-31 23:59",
 
   # write results to a csv:
   if(write){
-    filename <- paste0("F1twts_", end_time)
+    filename <- paste0("F1twts_", end_time, ".csv")
     write.csv(f1_twts_df, file=filename,
               row.names=FALSE)
   }

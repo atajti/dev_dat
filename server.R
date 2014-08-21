@@ -1,8 +1,14 @@
-    # analyzing tweets
-    dat <- read.csv("F1twts_2014-08-19 12:00:00.csv",
-                    stringsAsFactors=FALSE)
-    # create time variable:
-    dat$created <- as.POSIXct(dat$created)
+# loading packages
+library(ggplot2)
+library(igraph)
+
+# analyzing tweets
+dat <- read.csv("F1twts_2014-08-19 12:00:00.csv",
+                stringsAsFactors=FALSE)
+# create time variable:
+dat$created <- as.POSIXct(dat$created)
+# check "#F1" is in the tweet
+dat$F1 <- grepl("#F1", dat$text)
 
 
 
@@ -21,8 +27,40 @@ shinyServer(function(input, output) {
   output$distPlot <- renderPlot({
 
     # generate an rnorm distribution and plot it
-    ggplot(dat[(dat$screenName %in% input$users),],
-        aes(x=created, fill=screenName)) + 
-      geom_bar()
+    if(input$per_user){
+      # subset data
+      plot_data <- dat[(dat$screenName %in% input$users),] 
+      # plot it
+      g <- ggplot(plot_data,
+             aes(x=created, color=screenName)) + 
+           geom_line(stat="bin")
+    } else {
+      # copy data
+      plot_data <- dat
+      # plot it
+      g <- ggplot(dat,
+          aes(x=created)) + 
+        geom_line(stat="bin", color="blue")
+    }
+    
+    # if number of #F1 hashtags are important:
+    if(input$F1){
+      if(input$per_user){
+        g <- g + geom_area(data=plot_data[plot_data$F1,],
+                           aes(created,
+                             color=screenName,
+                             fill= screenName),
+                           stat="bin")
+      } else {
+        g <- g + geom_area(data=plot_data[plot_data$F1,],
+                           aes(created),
+                           stat="bin",
+                           color="red",
+                           fill="red")
+      }
+    }
+
+    # print the plot
+    print(g)
   })
 })
